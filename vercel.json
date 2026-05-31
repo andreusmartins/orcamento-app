@@ -1,19 +1,11 @@
 {
-<<<<<<< HEAD
   "version": 2,
   "buildCommand": "npm run build",
   "outputDirectory": "dist/orcamento-app/browser",
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/.*",
-      "dest": "/index.html"
-    }
-=======
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
->>>>>>> 29c16251af4a24f10ce4498f86ae5240b0476753
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
