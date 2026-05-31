@@ -1,0 +1,105 @@
+<div class="p-4 max-w-lg mx-auto">
+
+  <!-- Tela de lista de clientes -->
+  <div *ngIf="!clienteSelecionado">
+
+    <h1 class="text-xl font-semibold text-gray-800 mb-4">WhatsApp</h1>
+
+    <input [(ngModel)]="busca"
+           placeholder="Buscar cliente..."
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-green-200"/>
+
+    <div *ngIf="clientesFiltrados.length === 0"
+         class="text-center py-16 text-gray-400">
+      <div class="text-5xl mb-3">💬</div>
+      <p class="text-sm">Nenhum cliente encontrado</p>
+    </div>
+
+    <div *ngFor="let c of clientesFiltrados"
+         (click)="selecionar(c)"
+         class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-3 flex items-center gap-4 cursor-pointer hover:border-green-200 transition-colors active:bg-gray-50">
+
+      <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
+        {{ c.nome.charAt(0).toUpperCase() }}
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <p class="font-medium text-gray-800 truncate">{{ c.nome }}</p>
+        <p class="text-sm text-gray-500">{{ c.telefone }}</p>
+      </div>
+
+      <span class="text-green-500 text-2xl">›</span>
+    </div>
+
+  </div>
+
+  <!-- Tela do cliente selecionado -->
+  <div *ngIf="clienteSelecionado">
+
+    <div class="flex items-center gap-3 mb-6">
+      <button (click)="voltar()"
+              class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+        ‹
+      </button>
+      <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center font-medium text-green-700 flex-shrink-0">
+        {{ clienteSelecionado.nome.charAt(0).toUpperCase() }}
+      </div>
+      <div>
+        <p class="font-medium text-gray-800">{{ clienteSelecionado.nome }}</p>
+        <p class="text-sm text-gray-500">{{ clienteSelecionado.telefone }}</p>
+      </div>
+    </div>
+
+    <!-- Mensagens rápidas -->
+    <p class="text-sm text-gray-500 mb-3">Mensagens rápidas</p>
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <button *ngFor="let m of mensagensRapidas"
+              (click)="enviarMensagem(m.texto(clienteSelecionado.nome))"
+              class="bg-white border border-gray-100 rounded-2xl p-3 text-left hover:border-green-200 hover:bg-green-50 transition-colors shadow-sm">
+        <span class="text-2xl block mb-1">{{ m.icone }}</span>
+        <span class="text-sm text-gray-700 font-medium">{{ m.label }}</span>
+      </button>
+    </div>
+
+    <!-- Orçamentos do cliente -->
+    <div *ngIf="orcamentosDoCliente().length > 0" class="mb-6">
+      <p class="text-sm text-gray-500 mb-3">Orçamentos recentes</p>
+      <div *ngFor="let o of orcamentosDoCliente()"
+           class="bg-white rounded-2xl border border-gray-100 p-4 mb-3 shadow-sm">
+        <div class="flex justify-between items-center mb-2">
+          <span class="text-sm font-medium text-gray-700">Orçamento #{{ o.id }}</span>
+          <span [class]="'text-xs px-2 py-1 rounded-full font-medium ' + badgeClasse(o.status)">
+            {{ o.status | titlecase }}
+          </span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-lg font-semibold text-gray-800">
+            R$ {{ totalOrcamento(o).toFixed(2) }}
+          </span>
+          <button (click)="enviarOrcamento(o)"
+                  class="bg-green-500 text-white text-sm px-4 py-2 rounded-xl hover:bg-green-600 transition-colors">
+            Enviar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mensagem personalizada -->
+    <p class="text-sm text-gray-500 mb-3">Mensagem personalizada</p>
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+      <textarea [(ngModel)]="mensagemPersonalizada"
+                placeholder="Digite sua mensagem..."
+                rows="3"
+                class="w-full text-sm text-gray-700 resize-none focus:outline-none placeholder-gray-300"></textarea>
+      <div class="flex justify-end mt-3">
+        <button (click)="enviarPersonalizada()"
+                [disabled]="!mensagemPersonalizada.trim()"
+                class="bg-green-500 text-white text-sm px-6 py-2 rounded-xl disabled:opacity-40 hover:bg-green-600 transition-colors">
+          Enviar pelo WhatsApp
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

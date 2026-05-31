@@ -1,0 +1,125 @@
+<div class="p-4 max-w-lg mx-auto">
+
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-xl font-semibold text-gray-800">Servicos</h1>
+    <button (click)="carregar()"
+            class="bg-white border border-gray-200 text-gray-600 rounded-xl px-3 py-2 text-sm hover:bg-gray-50">
+      Atualizar
+    </button>
+  </div>
+
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-4">
+    <button *ngFor="let f of filtros"
+            (click)="filtro = f"
+            [class]="'rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap ' +
+              (filtro === f ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600')">
+      {{ f === 'servicos' ? 'Ordens' : (f | titlecase) }}
+    </button>
+  </div>
+
+  <div *ngIf="carregando" class="text-center py-10 text-gray-400 text-sm">
+    Carregando...
+  </div>
+
+  <div *ngIf="!carregando && filtrados.length === 0" class="text-center py-16 text-gray-400">
+    <p class="text-sm">Nenhum orcamento encontrado</p>
+  </div>
+
+  <div *ngFor="let o of filtrados" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-3">
+    <div class="flex justify-between gap-3 items-start mb-3">
+      <div>
+        <p class="font-medium text-gray-800">#{{ o.id }} - {{ o.cliente?.nome || 'Cliente' }}</p>
+        <p class="text-xs text-gray-400">{{ o.tipoServico || 'Servico sem categoria' }}</p>
+      </div>
+      <span [class]="'text-xs px-3 py-1 rounded-full font-medium ' + badgeClasse(o.status)">
+        {{ statusLabel(o.status) }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mb-3 text-sm">
+      <div class="bg-gray-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400">Valor</p>
+        <p class="font-semibold text-gray-800">R$ {{ total(o).toFixed(2) }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400">Ordem de servico</p>
+        <p class="font-semibold" [class.text-green-700]="o.ordemServico" [class.text-gray-500]="!o.ordemServico">
+          {{ o.ordemServico ? 'Sim' : 'Nao' }}
+        </p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400">Visita</p>
+        <p class="font-medium text-gray-700">{{ dataLabel(o.dataVisita) }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400">Servico</p>
+        <p class="font-medium text-gray-700">{{ dataLabel(o.dataServico) }}</p>
+      </div>
+    </div>
+
+    <p *ngIf="o.observacoesAgenda" class="text-sm text-gray-500 mb-3">
+      {{ o.observacoesAgenda }}
+    </p>
+
+    <div class="grid grid-cols-4 gap-2 mb-3">
+      <button *ngFor="let s of statusOptions"
+              (click)="atualizarStatus(o, s)"
+              [disabled]="o.status === s"
+              [class]="'rounded-lg border py-2 text-xs ' +
+                (o.status === s ? 'border-gray-200 text-gray-300' : 'border-gray-200 text-gray-600 hover:bg-gray-50')">
+        {{ statusLabel(s) }}
+      </button>
+    </div>
+
+    <div class="flex gap-2">
+      <button (click)="abrirAgenda(o)"
+              class="flex-1 bg-white border border-gray-200 text-gray-700 rounded-xl p-3 text-sm hover:bg-gray-50">
+        Agenda
+      </button>
+      <button (click)="transformar(o)"
+              [disabled]="o.ordemServico"
+              class="flex-1 bg-blue-600 text-white rounded-xl p-3 text-sm font-medium disabled:opacity-40 hover:bg-blue-700">
+        Virar servico
+      </button>
+    </div>
+
+    <div *ngIf="editandoAgendaId === o.id" class="mt-4 border-t border-gray-100 pt-4">
+      <label class="block text-sm text-gray-500 mb-1">Tipo de servico</label>
+      <input [(ngModel)]="agendaForm.tipoServico"
+             placeholder="Ex: eletrica, vidro, pintura"
+             class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+      <label class="block text-sm text-gray-500 mb-1">Visita</label>
+      <input [(ngModel)]="agendaForm.dataVisita"
+             type="datetime-local"
+             class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+      <label class="block text-sm text-gray-500 mb-1">Servico agendado</label>
+      <input [(ngModel)]="agendaForm.dataServico"
+             type="datetime-local"
+             class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+      <label class="block text-sm text-gray-500 mb-1">Retorno</label>
+      <input [(ngModel)]="agendaForm.dataRetorno"
+             type="datetime-local"
+             class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+      <textarea [(ngModel)]="agendaForm.observacoesAgenda"
+                rows="2"
+                placeholder="Observacoes da agenda"
+                class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"></textarea>
+
+      <div class="flex gap-2">
+        <button (click)="cancelarAgenda()"
+                class="flex-1 border border-gray-200 text-gray-600 rounded-xl p-3 text-sm">
+          Cancelar
+        </button>
+        <button (click)="salvarAgenda()"
+                class="flex-1 bg-blue-600 text-white rounded-xl p-3 text-sm font-medium">
+          Salvar agenda
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

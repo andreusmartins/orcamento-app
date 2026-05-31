@@ -1,0 +1,146 @@
+<div class="p-4 max-w-lg mx-auto">
+
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-xl font-semibold text-gray-800">Recebimentos</h1>
+    <button (click)="abrirFormulario()"
+            class="bg-blue-600 text-white rounded-xl px-4 py-2 text-sm font-medium hover:bg-blue-700 transition-colors">
+      + Novo
+    </button>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 mb-4">
+    <div class="bg-green-50 rounded-2xl p-4">
+      <p class="text-xs text-green-600 mb-1">Recebido</p>
+      <p class="text-xl font-semibold text-green-700">R$ {{ totalPago.toFixed(2) }}</p>
+    </div>
+    <div class="bg-yellow-50 rounded-2xl p-4">
+      <p class="text-xs text-yellow-600 mb-1">A receber</p>
+      <p class="text-xl font-semibold text-yellow-700">R$ {{ totalPendente.toFixed(2) }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="mostrarFormulario"
+       class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+
+    <h2 class="text-base font-medium text-gray-700 mb-4">Novo recebimento</h2>
+
+    <label class="block text-sm text-gray-500 mb-1">Orcamento</label>
+    <select [(ngModel)]="form.orcamentoId"
+            class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200">
+      <option [ngValue]="null" disabled>Selecione um orcamento</option>
+      <option *ngFor="let o of orcamentos" [ngValue]="o.id">
+        #{{ o.id }} - {{ o.cliente?.nome }} - R$ {{ totalOrcamento({ orcamento: o, valor: 0, status: 'pendente' }).toFixed(2) }}
+      </option>
+    </select>
+
+    <label class="block text-sm text-gray-500 mb-1">Valor recebido (R$)</label>
+    <input [(ngModel)]="form.valor"
+           type="number"
+           placeholder="0,00"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+    <label class="block text-sm text-gray-500 mb-1">Status</label>
+    <div class="grid grid-cols-4 gap-2 mb-3">
+      <button *ngFor="let s of statusOptions"
+              (click)="form.status = s"
+              [class]="'rounded-xl p-2 text-xs font-medium border transition-colors ' +
+                (form.status === s ? badgeClasse(s) + ' border-transparent' : 'border-gray-200 text-gray-500 hover:bg-gray-50')">
+        {{ s | titlecase }}
+      </button>
+    </div>
+
+    <label class="block text-sm text-gray-500 mb-1">Forma de pagamento</label>
+    <select [(ngModel)]="form.formaPagamento"
+            class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200">
+      <option *ngFor="let forma of formasPagamento" [ngValue]="forma">{{ forma }}</option>
+    </select>
+
+    <label class="block text-sm text-gray-500 mb-1">Chave Pix</label>
+    <input [(ngModel)]="form.pix"
+           placeholder="CPF, telefone, e-mail ou chave aleatoria"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+    <label class="block text-sm text-gray-500 mb-1">Vencimento</label>
+    <input [(ngModel)]="form.dataVencimento"
+           type="date"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+    <textarea [(ngModel)]="form.observacao"
+              rows="2"
+              placeholder="Observacao do pagamento"
+              class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"></textarea>
+
+    <div class="flex gap-3">
+      <button (click)="cancelar()"
+              class="flex-1 border border-gray-200 text-gray-600 rounded-xl p-3 text-sm hover:bg-gray-50">
+        Cancelar
+      </button>
+      <button (click)="salvar()" [disabled]="carregando || !form.orcamentoId || !form.valor"
+              class="flex-1 bg-blue-600 text-white rounded-xl p-3 text-sm font-medium disabled:opacity-50 hover:bg-blue-700">
+        {{ carregando ? 'Salvando...' : 'Salvar' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
+    <button *ngFor="let f of filtros"
+            (click)="filtro = f"
+            [class]="'rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ' +
+              (filtro === f ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50')">
+      {{ f | titlecase }}
+    </button>
+  </div>
+
+  <div *ngIf="recebimentosFiltrados.length === 0"
+       class="text-center py-16 text-gray-400">
+    <p class="text-sm">Nenhum recebimento encontrado</p>
+  </div>
+
+  <div *ngFor="let r of recebimentosFiltrados"
+       class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-3">
+
+    <div class="flex justify-between items-start mb-2">
+      <div>
+        <p class="font-medium text-gray-800">{{ nomeCliente(r) }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">Orcamento #{{ r.orcamento?.id }} - {{ dataLabel(r.dataVencimento) }}</p>
+      </div>
+      <span [class]="'text-xs px-3 py-1 rounded-full font-medium ' + badgeClasse(r.status)">
+        {{ r.status | titlecase }}
+      </span>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mb-3">
+      <div class="bg-gray-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400">Recebido</p>
+        <p class="font-semibold text-gray-800">R$ {{ r.valor.toFixed(2) }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400">Pagamento</p>
+        <p class="font-medium text-gray-700">{{ r.formaPagamento || 'Nao informado' }}</p>
+      </div>
+    </div>
+
+    <p *ngIf="r.pix" class="text-sm text-gray-500 mb-2">Pix: {{ r.pix }}</p>
+    <p *ngIf="r.observacao" class="text-sm text-gray-500 mb-3">{{ r.observacao }}</p>
+
+    <div *ngIf="totalOrcamento(r) > 0" class="flex justify-between items-center mb-3">
+      <span class="text-sm text-gray-500">Total do orcamento</span>
+      <span class="text-sm text-gray-600">R$ {{ totalOrcamento(r).toFixed(2) }}</span>
+    </div>
+
+    <div class="grid grid-cols-5 gap-2 pt-3 border-t border-gray-100">
+      <button *ngFor="let s of statusOptions"
+              (click)="atualizarStatus(r.id!, s)"
+              [disabled]="r.status === s"
+              [class]="'text-xs py-1.5 rounded-lg border transition-colors ' +
+                (r.status === s ? 'opacity-40 cursor-default border-gray-200 text-gray-400' : 'border-gray-200 text-gray-600 hover:bg-gray-50')">
+        {{ s | titlecase }}
+      </button>
+      <button (click)="deletar(r.id!)"
+              class="text-red-400 text-xs px-2 hover:text-red-600">
+        remover
+      </button>
+    </div>
+  </div>
+
+</div>

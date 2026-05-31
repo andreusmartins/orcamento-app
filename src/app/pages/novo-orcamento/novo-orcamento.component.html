@@ -1,0 +1,124 @@
+<div class="p-4 max-w-lg mx-auto">
+
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-xl font-semibold text-gray-800">Novo orcamento</h1>
+    <button (click)="mostrarEmpresa = !mostrarEmpresa"
+            class="bg-white border border-gray-200 text-gray-600 rounded-xl px-3 py-2 text-sm hover:bg-gray-50">
+      Empresa
+    </button>
+  </div>
+
+  <div *ngIf="sucesso" class="bg-green-50 border border-green-200 text-green-700 rounded-xl p-3 mb-4 text-sm">
+    Orcamento salvo com sucesso!
+  </div>
+
+  <div *ngIf="mostrarEmpresa" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+    <h2 class="text-base font-medium text-gray-700 mb-4">Dados da empresa no PDF</h2>
+
+    <input [(ngModel)]="empresa.nome" placeholder="Nome da empresa"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+    <input [(ngModel)]="empresa.telefone" placeholder="Telefone"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+    <input [(ngModel)]="empresa.documento" placeholder="CPF, CNPJ ou MEI"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+    <input [(ngModel)]="empresa.endereco" placeholder="Endereco"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+    <input [(ngModel)]="empresa.pix" placeholder="Chave Pix"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+    <label class="block text-sm text-gray-500 mb-1">Logo</label>
+    <input type="file" accept="image/*" (change)="carregarLogo($event)"
+           class="w-full text-sm text-gray-500 mb-4"/>
+
+    <button (click)="salvarEmpresa()"
+            class="w-full bg-blue-600 text-white rounded-xl p-3 text-sm font-medium hover:bg-blue-700">
+      Salvar dados da empresa
+    </button>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+    <label class="block text-sm text-gray-500 mb-1">Cliente</label>
+    <select [(ngModel)]="clienteSelecionado"
+            class="w-full border border-gray-200 rounded-xl p-3 text-gray-800 text-base focus:outline-none focus:ring-2 focus:ring-blue-300">
+      <option [ngValue]="null" disabled>Selecione um cliente</option>
+      <option *ngFor="let c of clientes" [ngValue]="c.id">{{ c.nome }}</option>
+    </select>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+    <label class="block text-sm text-gray-500 mb-3">Agenda simples</label>
+
+    <input [(ngModel)]="agenda.tipoServico" placeholder="Tipo de servico"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+    <label class="block text-xs text-gray-400 mb-1">Marcar visita</label>
+    <input [(ngModel)]="agenda.dataVisita" type="datetime-local"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+    <label class="block text-xs text-gray-400 mb-1">Servico agendado</label>
+    <input [(ngModel)]="agenda.dataServico" type="datetime-local"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+    <label class="block text-xs text-gray-400 mb-1">Data de retorno</label>
+    <input [(ngModel)]="agenda.dataRetorno" type="datetime-local"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+    <textarea [(ngModel)]="agenda.observacoesAgenda" rows="2" placeholder="Observacoes da agenda"
+              class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"></textarea>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+    <label class="block text-sm text-gray-500 mb-3">Itens do orcamento</label>
+
+    <div *ngFor="let item of itens; let i = index"
+         class="border border-gray-100 rounded-xl p-3 mb-3">
+
+      <div class="flex justify-between items-center mb-2">
+        <span class="text-sm font-medium text-gray-600">Item {{ i + 1 }}</span>
+        <button *ngIf="itens.length > 1" (click)="removerItem(i)"
+                class="text-red-400 text-sm hover:text-red-600">remover</button>
+      </div>
+
+      <input [(ngModel)]="item.descricao"
+             placeholder="Descricao"
+             class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+      <input [(ngModel)]="item.valor"
+             type="number"
+             placeholder="Valor (R$)"
+             class="w-full border border-gray-200 rounded-lg p-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
+      <input [(ngModel)]="item.observacao"
+             placeholder="Observacao (opcional)"
+             class="w-full border border-gray-200 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+    </div>
+
+    <button (click)="adicionarItem()"
+            class="w-full border-2 border-dashed border-gray-200 rounded-xl p-3 text-gray-400 text-sm hover:border-blue-300 hover:text-blue-400 transition-colors">
+      + Adicionar item
+    </button>
+  </div>
+
+  <div class="bg-blue-50 rounded-2xl p-4 mb-4 flex justify-between items-center">
+    <span class="text-gray-600 font-medium">Total</span>
+    <span class="text-2xl font-semibold text-blue-600">R$ {{ total.toFixed(2) }}</span>
+  </div>
+
+  <div class="flex flex-col gap-3">
+    <button (click)="salvar()" [disabled]="carregando || !clienteSelecionado"
+            class="w-full bg-blue-600 text-white rounded-2xl p-4 text-base font-medium disabled:opacity-50 hover:bg-blue-700 transition-colors">
+      {{ carregando ? 'Salvando...' : 'Salvar orcamento' }}
+    </button>
+
+    <button (click)="gerarPDF()" [disabled]="!clienteSelecionado"
+            class="w-full bg-white border border-gray-200 text-gray-700 rounded-2xl p-4 text-base font-medium disabled:opacity-50 hover:bg-gray-50 transition-colors">
+      Gerar PDF
+    </button>
+
+    <button (click)="enviarWhatsApp()" [disabled]="!clienteSelecionado"
+            class="w-full bg-green-500 text-white rounded-2xl p-4 text-base font-medium disabled:opacity-50 hover:bg-green-600 transition-colors">
+      Enviar pelo WhatsApp
+    </button>
+  </div>
+
+</div>
