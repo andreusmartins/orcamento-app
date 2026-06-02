@@ -1,3 +1,3 @@
 export const environment = {
-  apiUrl: 'https://SEU-APP.railway.app'  // <-- substitua pela URL do Railway após o deploy
+  apiUrl: 'kodama.proxy.rlwy.net:37660'  // <-- substitua pela URL do Railway após o deploy
 };
