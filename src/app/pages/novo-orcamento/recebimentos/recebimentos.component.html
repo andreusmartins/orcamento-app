@@ -1,146 +1,171 @@
-<div class="p-4 max-w-lg mx-auto">
+<div class="p-4 max-w-lg mx-auto pb-24">
 
   <div class="flex justify-between items-center mb-4">
     <h1 class="text-xl font-semibold text-gray-800">Recebimentos</h1>
     <button (click)="abrirFormulario()"
-            class="bg-blue-600 text-white rounded-xl px-4 py-2 text-sm font-medium hover:bg-blue-700 transition-colors">
-      + Novo
+            class="bg-blue-600 text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors">
+      + Registrar
     </button>
   </div>
 
+  <!-- Totais -->
   <div class="grid grid-cols-2 gap-3 mb-4">
-    <div class="bg-green-50 rounded-2xl p-4">
-      <p class="text-xs text-green-600 mb-1">Recebido</p>
-      <p class="text-xl font-semibold text-green-700">R$ {{ totalPago.toFixed(2) }}</p>
+    <div class="bg-green-50 border border-green-100 rounded-2xl p-4">
+      <p class="text-xs text-green-600 mb-1 font-medium">✅ Recebido</p>
+      <p class="text-2xl font-bold text-green-700">R$ {{ totalPago.toFixed(2) }}</p>
     </div>
-    <div class="bg-yellow-50 rounded-2xl p-4">
-      <p class="text-xs text-yellow-600 mb-1">A receber</p>
-      <p class="text-xl font-semibold text-yellow-700">R$ {{ totalPendente.toFixed(2) }}</p>
+    <div class="bg-yellow-50 border border-yellow-100 rounded-2xl p-4">
+      <p class="text-xs text-yellow-600 mb-1 font-medium">⏳ A receber</p>
+      <p class="text-2xl font-bold text-yellow-700">R$ {{ totalPendente.toFixed(2) }}</p>
     </div>
   </div>
 
-  <div *ngIf="mostrarFormulario"
-       class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+  <!-- Formulário novo recebimento -->
+  <div *ngIf="mostrarFormulario" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+    <h2 class="text-base font-semibold text-gray-700 mb-4">💰 Registrar recebimento</h2>
 
-    <h2 class="text-base font-medium text-gray-700 mb-4">Novo recebimento</h2>
-
-    <label class="block text-sm text-gray-500 mb-1">Orcamento</label>
+    <label class="block text-sm font-medium text-gray-600 mb-1">De qual orçamento?</label>
     <select [(ngModel)]="form.orcamentoId"
-            class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200">
-      <option [ngValue]="null" disabled>Selecione um orcamento</option>
+            class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200">
+      <option [ngValue]="null" disabled>Selecione o orçamento</option>
       <option *ngFor="let o of orcamentos" [ngValue]="o.id">
-        #{{ o.id }} - {{ o.cliente?.nome }} - R$ {{ totalOrcamento({ orcamento: o, valor: 0, status: 'pendente' }).toFixed(2) }}
+        #{{ o.id }} - {{ o.cliente?.nome }} — R$ {{ totalOrcamentoByObj(o).toFixed(2) }}
       </option>
     </select>
 
-    <label class="block text-sm text-gray-500 mb-1">Valor recebido (R$)</label>
+    <label class="block text-sm font-medium text-gray-600 mb-1">Valor recebido (R$)</label>
     <input [(ngModel)]="form.valor"
            type="number"
            placeholder="0,00"
-           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
 
-    <label class="block text-sm text-gray-500 mb-1">Status</label>
-    <div class="grid grid-cols-4 gap-2 mb-3">
+    <label class="block text-sm font-medium text-gray-600 mb-2">Situação do pagamento</label>
+    <div class="grid grid-cols-2 gap-2 mb-4">
       <button *ngFor="let s of statusOptions"
               (click)="form.status = s"
-              [class]="'rounded-xl p-2 text-xs font-medium border transition-colors ' +
-                (form.status === s ? badgeClasse(s) + ' border-transparent' : 'border-gray-200 text-gray-500 hover:bg-gray-50')">
-        {{ s | titlecase }}
+              [class]="'rounded-xl p-3 text-sm font-semibold border transition-colors ' +
+                (form.status === s
+                  ? (s === 'pago' ? 'bg-green-100 text-green-700 border-green-300' :
+                     s === 'parcial' ? 'bg-blue-100 text-blue-700 border-blue-300' :
+                     s === 'pendente' ? 'bg-yellow-100 text-yellow-700 border-yellow-300' :
+                     'bg-red-100 text-red-700 border-red-300')
+                  : 'border-gray-200 text-gray-500 hover:bg-gray-50')">
+        {{ s === 'pago' ? '✅ Pago' :
+           s === 'parcial' ? '🔵 Parcial' :
+           s === 'pendente' ? '⏳ Pendente' : '❌ Vencido' }}
       </button>
     </div>
 
-    <label class="block text-sm text-gray-500 mb-1">Forma de pagamento</label>
+    <label class="block text-sm font-medium text-gray-600 mb-1">Forma de pagamento</label>
     <select [(ngModel)]="form.formaPagamento"
-            class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200">
+            class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200">
       <option *ngFor="let forma of formasPagamento" [ngValue]="forma">{{ forma }}</option>
     </select>
 
-    <label class="block text-sm text-gray-500 mb-1">Chave Pix</label>
+    <label class="block text-sm font-medium text-gray-600 mb-1">Chave Pix (opcional)</label>
     <input [(ngModel)]="form.pix"
-           placeholder="CPF, telefone, e-mail ou chave aleatoria"
-           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+           placeholder="CPF, telefone, e-mail ou chave aleatória"
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
 
-    <label class="block text-sm text-gray-500 mb-1">Vencimento</label>
+    <label class="block text-sm font-medium text-gray-600 mb-1">Data de vencimento (opcional)</label>
     <input [(ngModel)]="form.dataVencimento"
            type="date"
-           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+           class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
 
     <textarea [(ngModel)]="form.observacao"
               rows="2"
-              placeholder="Observacao do pagamento"
+              placeholder="Observação sobre o pagamento (opcional)"
               class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"></textarea>
 
     <div class="flex gap-3">
       <button (click)="cancelar()"
-              class="flex-1 border border-gray-200 text-gray-600 rounded-xl p-3 text-sm hover:bg-gray-50">
+              class="flex-1 border border-gray-200 text-gray-600 rounded-xl p-3 text-sm font-medium hover:bg-gray-50">
         Cancelar
       </button>
       <button (click)="salvar()" [disabled]="carregando || !form.orcamentoId || !form.valor"
-              class="flex-1 bg-blue-600 text-white rounded-xl p-3 text-sm font-medium disabled:opacity-50 hover:bg-blue-700">
-        {{ carregando ? 'Salvando...' : 'Salvar' }}
+              class="flex-1 bg-blue-600 text-white rounded-xl p-3 text-sm font-semibold disabled:opacity-50 hover:bg-blue-700 active:bg-blue-800 transition-colors">
+        {{ carregando ? 'Salvando...' : '💾 Salvar' }}
       </button>
     </div>
   </div>
 
+  <!-- Filtros -->
   <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
     <button *ngFor="let f of filtros"
             (click)="filtro = f"
-            [class]="'rounded-xl px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ' +
-              (filtro === f ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50')">
-      {{ f | titlecase }}
+            [class]="'rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ' +
+              (filtro === f ? 'bg-blue-600 text-white' : 'bg-white border border-gray-200 text-gray-600')">
+      {{ f === 'todos' ? 'Todos' :
+         f === 'pago' ? '✅ Pago' :
+         f === 'parcial' ? '🔵 Parcial' :
+         f === 'pendente' ? '⏳ Pendente' : '❌ Vencido' }}
     </button>
   </div>
 
   <div *ngIf="recebimentosFiltrados.length === 0"
        class="text-center py-16 text-gray-400">
+    <p class="text-4xl mb-3">💰</p>
     <p class="text-sm">Nenhum recebimento encontrado</p>
   </div>
 
   <div *ngFor="let r of recebimentosFiltrados"
        class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-3">
 
-    <div class="flex justify-between items-start mb-2">
+    <div class="flex justify-between items-start mb-3">
       <div>
-        <p class="font-medium text-gray-800">{{ nomeCliente(r) }}</p>
-        <p class="text-xs text-gray-400 mt-0.5">Orcamento #{{ r.orcamento?.id }} - {{ dataLabel(r.dataVencimento) }}</p>
+        <p class="font-semibold text-gray-800 text-base">{{ nomeCliente(r) }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">Orçamento #{{ r.orcamento?.id }} · {{ dataLabel(r.dataVencimento) }}</p>
       </div>
-      <span [class]="'text-xs px-3 py-1 rounded-full font-medium ' + badgeClasse(r.status)">
-        {{ r.status | titlecase }}
+      <span [class]="'text-xs px-3 py-1.5 rounded-full font-semibold ' + badgeClasse(r.status)">
+        {{ r.status === 'pago' ? '✅ Pago' :
+           r.status === 'parcial' ? '🔵 Parcial' :
+           r.status === 'pendente' ? '⏳ Pendente' : '❌ Vencido' }}
       </span>
     </div>
 
     <div class="grid grid-cols-2 gap-2 mb-3">
       <div class="bg-gray-50 rounded-xl p-3">
-        <p class="text-xs text-gray-400">Recebido</p>
-        <p class="font-semibold text-gray-800">R$ {{ r.valor.toFixed(2) }}</p>
+        <p class="text-xs text-gray-400 mb-1">Valor recebido</p>
+        <p class="font-bold text-gray-800">R$ {{ r.valor.toFixed(2) }}</p>
       </div>
       <div class="bg-gray-50 rounded-xl p-3">
-        <p class="text-xs text-gray-400">Pagamento</p>
-        <p class="font-medium text-gray-700">{{ r.formaPagamento || 'Nao informado' }}</p>
+        <p class="text-xs text-gray-400 mb-1">Pagamento</p>
+        <p class="font-medium text-gray-700">{{ r.formaPagamento || 'Não informado' }}</p>
+      </div>
+      <div *ngIf="totalOrcamento(r) > 0" class="col-span-2 bg-gray-50 rounded-xl p-3">
+        <p class="text-xs text-gray-400 mb-1">Total do orçamento</p>
+        <p class="font-medium text-gray-700">R$ {{ totalOrcamento(r).toFixed(2) }}</p>
       </div>
     </div>
 
-    <p *ngIf="r.pix" class="text-sm text-gray-500 mb-2">Pix: {{ r.pix }}</p>
-    <p *ngIf="r.observacao" class="text-sm text-gray-500 mb-3">{{ r.observacao }}</p>
+    <p *ngIf="r.pix" class="text-sm text-gray-500 mb-2">🔑 Pix: {{ r.pix }}</p>
+    <p *ngIf="r.observacao" class="text-sm text-gray-500 mb-3 bg-gray-50 rounded-xl p-3">💬 {{ r.observacao }}</p>
 
-    <div *ngIf="totalOrcamento(r) > 0" class="flex justify-between items-center mb-3">
-      <span class="text-sm text-gray-500">Total do orcamento</span>
-      <span class="text-sm text-gray-600">R$ {{ totalOrcamento(r).toFixed(2) }}</span>
-    </div>
-
-    <div class="grid grid-cols-5 gap-2 pt-3 border-t border-gray-100">
-      <button *ngFor="let s of statusOptions"
-              (click)="atualizarStatus(r.id!, s)"
-              [disabled]="r.status === s"
-              [class]="'text-xs py-1.5 rounded-lg border transition-colors ' +
-                (r.status === s ? 'opacity-40 cursor-default border-gray-200 text-gray-400' : 'border-gray-200 text-gray-600 hover:bg-gray-50')">
-        {{ s | titlecase }}
-      </button>
+    <!-- Alterar situação -->
+    <div class="border-t border-gray-100 pt-3">
+      <p class="text-xs text-gray-400 mb-2 font-medium">Alterar situação:</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button *ngFor="let s of statusOptions"
+                (click)="atualizarStatus(r.id!, s)"
+                [disabled]="r.status === s"
+                [class]="'text-sm py-2.5 rounded-xl border font-medium transition-colors ' +
+                  (r.status === s
+                    ? (s === 'pago' ? 'bg-green-100 text-green-700 border-green-200 cursor-default' :
+                       s === 'parcial' ? 'bg-blue-100 text-blue-700 border-blue-200 cursor-default' :
+                       s === 'pendente' ? 'bg-yellow-100 text-yellow-700 border-yellow-200 cursor-default' :
+                       'bg-red-100 text-red-700 border-red-200 cursor-default')
+                    : 'border-gray-200 text-gray-600 hover:bg-gray-50 active:bg-gray-100')">
+          {{ s === 'pago' ? '✅ Pago' :
+             s === 'parcial' ? '🔵 Parcial' :
+             s === 'pendente' ? '⏳ Pendente' : '❌ Vencido' }}
+        </button>
+      </div>
       <button (click)="deletar(r.id!)"
-              class="text-red-400 text-xs px-2 hover:text-red-600">
-        remover
+              class="mt-2 w-full text-red-400 text-sm py-2 rounded-xl border border-red-100 hover:bg-red-50 active:bg-red-100 transition-colors">
+        🗑️ Remover registro
       </button>
     </div>
+
   </div>
 
 </div>

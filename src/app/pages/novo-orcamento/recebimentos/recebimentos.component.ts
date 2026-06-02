@@ -111,8 +111,14 @@ export class RecebimentosComponent implements OnInit {
     return r.orcamento?.cliente?.nome || 'Cliente';
   }
 
+  totalOrcamentoByObj(o: Orcamento): number {
+    return o?.itens?.reduce((acc, i) => acc + i.valor, 0) || 0;
+  }
+
   totalOrcamento(r: Recebimento): number {
-    return r.orcamento?.itens?.reduce((acc, i) => acc + i.valor, 0) || 0;
+    // itens vem ignorado pelo backend no relacionamento, busca da lista local
+    const orcamento = this.orcamentos.find(o => o.id === r.orcamento?.id);
+    return orcamento?.itens?.reduce((acc, i) => acc + i.valor, 0) || 0;
   }
 
   statusCalculado(r: Recebimento): StatusRecebimento {

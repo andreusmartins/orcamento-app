@@ -1,0 +1,194 @@
+<div class="min-h-screen bg-gray-100">
+
+  <!-- Header -->
+  <div class="bg-indigo-700 text-white px-4 py-4 flex items-center justify-between shadow">
+    <div>
+      <h1 class="text-xl font-bold">🏢 Painel do Dono</h1>
+      <p class="text-indigo-200 text-sm">Gerencie todas as empresas clientes</p>
+    </div>
+    <button (click)="sair()"
+      class="bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-red-600">
+      Sair
+    </button>
+  </div>
+
+  <div class="max-w-2xl mx-auto p-4">
+
+    <!-- Alertas -->
+    <div *ngIf="sucesso" class="bg-green-100 text-green-800 rounded-xl px-4 py-3 mb-4 font-semibold text-center">
+      ✅ {{ sucesso }}
+    </div>
+    <div *ngIf="erro" class="bg-red-100 text-red-700 rounded-xl px-4 py-3 mb-4 font-semibold text-center">
+      ⚠️ {{ erro }}
+      <button (click)="erro=''" class="ml-2 underline text-sm">fechar</button>
+    </div>
+
+    <!-- Modal usuários de uma empresa -->
+    <div *ngIf="mostrarUsuarios" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center p-4">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-screen overflow-y-auto">
+        <div class="flex justify-between items-center p-4 border-b">
+          <h2 class="text-lg font-bold text-gray-800">👥 Usuários — {{ empresaNome() }}</h2>
+          <button (click)="fecharUsuarios()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+        </div>
+
+        <div class="p-4">
+          <button (click)="mostrarFormUsuario = !mostrarFormUsuario"
+            class="w-full bg-green-600 text-white font-bold py-3 rounded-xl mb-4 hover:bg-green-700 transition-colors">
+            {{ mostrarFormUsuario ? '❌ Cancelar' : '➕ Adicionar Usuário' }}
+          </button>
+
+          <div *ngIf="mostrarFormUsuario" class="bg-gray-50 rounded-xl p-4 mb-4">
+            <input type="text" [(ngModel)]="novoUsuario.nome" placeholder="Nome completo"
+              class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-3 focus:border-blue-500 focus:outline-none"/>
+            <input type="email" [(ngModel)]="novoUsuario.email" placeholder="E-mail"
+              class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-3 focus:border-blue-500 focus:outline-none"/>
+            <input type="text" [(ngModel)]="novoUsuario.senha" placeholder="Senha inicial"
+              class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-3 focus:border-blue-500 focus:outline-none"/>
+            <button (click)="criarUsuario()" [disabled]="criandoUsuario"
+              class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 disabled:opacity-60">
+              {{ criandoUsuario ? 'Criando...' : '✅ Criar Usuário' }}
+            </button>
+          </div>
+
+          <div *ngIf="usuarios.length === 0" class="text-center text-gray-400 py-6">
+            Nenhum usuário nesta empresa ainda.
+          </div>
+
+          <div *ngFor="let u of usuarios" class="bg-white border border-gray-100 rounded-xl p-4 mb-3 shadow-sm"
+               [class.opacity-50]="!u.ativo">
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <p class="font-bold text-gray-800">{{ u.nome }}</p>
+                <p class="text-sm text-gray-500">{{ u.email }}</p>
+                <span class="text-xs px-2 py-0.5 rounded-full font-semibold"
+                  [class]="u.ativo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                  {{ u.ativo ? '✅ Ativo' : '🚫 Bloqueado' }}
+                </span>
+              </div>
+              <button (click)="alternarAtivoUsuario(u)"
+                class="text-sm font-bold px-3 py-2 rounded-xl"
+                [class]="u.ativo ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-green-100 text-green-700 hover:bg-green-200'">
+                {{ u.ativo ? '🚫 Bloquear' : '✅ Liberar' }}
+              </button>
+            </div>
+            <div class="flex gap-2 mt-2">
+              <input type="text" [(ngModel)]="senhaMap[u.id]" placeholder="Nova senha"
+                class="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"/>
+              <button (click)="alterarSenha(u)"
+                class="bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-gray-800">
+                Salvar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botão nova empresa -->
+    <button (click)="abrirNova()"
+      class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl text-lg mb-4 transition-colors">
+      ➕ Nova Empresa Cliente
+    </button>
+
+    <!-- Form criar/editar empresa -->
+    <div *ngIf="mostrarForm" class="bg-white rounded-2xl shadow p-6 mb-4">
+      <h2 class="text-lg font-bold text-gray-700 mb-4">
+        {{ editando ? '✏️ Editar Empresa' : '🏢 Nova Empresa' }}
+      </h2>
+
+      <label class="block text-gray-600 font-semibold mb-1">Nome da empresa *</label>
+      <input type="text" [(ngModel)]="form.nome" placeholder="Ex: Vidraçaria do João"
+        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-4 focus:border-indigo-500 focus:outline-none"/>
+
+      <label class="block text-gray-600 font-semibold mb-1">WhatsApp / Telefone</label>
+      <input type="text" [(ngModel)]="form.telefone" placeholder="(11) 99999-9999"
+        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-4 focus:border-indigo-500 focus:outline-none"/>
+
+      <label class="block text-gray-600 font-semibold mb-1">Valor da mensalidade (R$)</label>
+      <input type="number" [(ngModel)]="form.valorMensalidade" placeholder="0,00"
+        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-4 focus:border-indigo-500 focus:outline-none"/>
+
+      <label class="block text-gray-600 font-semibold mb-1">Vencimento da mensalidade</label>
+      <input type="date" [(ngModel)]="form.dataVencimento"
+        class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-5 focus:border-indigo-500 focus:outline-none"/>
+
+      <div class="flex gap-3">
+        <button (click)="mostrarForm = false"
+          class="flex-1 border-2 border-gray-200 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button (click)="salvar()"
+          class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition-colors">
+          💾 Salvar
+        </button>
+      </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+        <p class="text-2xl font-bold text-indigo-700">{{ empresas.length }}</p>
+        <p class="text-xs text-gray-500">Total</p>
+      </div>
+      <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+        <p class="text-2xl font-bold text-green-600">{{ empresasAtivas }}</p>
+        <p class="text-xs text-gray-500">Ativas</p>
+      </div>
+      <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+        <p class="text-2xl font-bold text-red-500">{{ empresasVencidas }}</p>
+        <p class="text-xs text-gray-500">Vencidas</p>
+      </div>
+    </div>
+
+    <!-- Lista de empresas -->
+    <div *ngIf="carregando" class="text-center text-gray-400 py-8">Carregando...</div>
+
+    <div *ngIf="!carregando && empresas.length === 0" class="text-center text-gray-400 py-12">
+      <p class="text-4xl mb-3">🏢</p>
+      <p>Nenhuma empresa cadastrada ainda.</p>
+    </div>
+
+    <div *ngFor="let e of empresas"
+         class="bg-white rounded-2xl shadow mb-3 p-4"
+         [class.opacity-60]="!e.ativo">
+
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <p class="font-bold text-gray-800 text-lg">{{ e.nome }}</p>
+            <span class="text-xs px-2 py-0.5 rounded-full font-semibold"
+              [class]="e.ativo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+              {{ e.ativo ? '✅ Ativa' : '🚫 Bloqueada' }}
+            </span>
+          </div>
+          <p *ngIf="e.telefone" class="text-sm text-gray-500">📱 {{ e.telefone }}</p>
+          <p class="text-sm" [class]="vencimentoClasse(e)">
+            📅 Vencimento: {{ dataLabel(e.dataVencimento) }}
+          </p>
+          <p *ngIf="e.valorMensalidade" class="text-sm text-gray-500">
+            💰 Mensalidade: R$ {{ e.valorMensalidade?.toFixed(2) }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="grid grid-cols-3 gap-2">
+        <button (click)="abrirUsuarios(e)"
+          class="bg-blue-100 text-blue-700 font-bold py-2.5 rounded-xl text-sm hover:bg-blue-200 transition-colors">
+          👥 Usuários
+        </button>
+        <button (click)="abrirEditar(e)"
+          class="bg-gray-100 text-gray-700 font-bold py-2.5 rounded-xl text-sm hover:bg-gray-200 transition-colors">
+          ✏️ Editar
+        </button>
+        <button (click)="alternarAtivo(e)"
+          class="font-bold py-2.5 rounded-xl text-sm transition-colors"
+          [class]="e.ativo ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-green-100 text-green-700 hover:bg-green-200'">
+          {{ e.ativo ? '🚫 Bloquear' : '✅ Liberar' }}
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>

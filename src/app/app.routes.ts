@@ -5,13 +5,20 @@ import { RecebimentosComponent } from './pages/novo-orcamento/recebimentos/receb
 import { WhatsappComponent } from './pages/novo-orcamento/whatsapp/whatsapp.component';
 import { CalculadoraComponent } from './pages/calculadora/calculadora.component';
 import { ServicosComponent } from './pages/servicos/servicos.component';
+import { LoginComponent } from './pages/login/login.component';
+import { AdminComponent } from './pages/admin/admin.component';
+import { SuperAdminComponent } from './pages/super-admin/super-admin.component';
+import { authGuard, adminGuard, superAdminGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'novo-orcamento', pathMatch: 'full' },
-  { path: 'novo-orcamento', component: NovoOrcamentoComponent },
-  { path: 'clientes', component: ClientesComponent },
-  { path: 'recebimentos', component: RecebimentosComponent },
-  { path: 'whatsapp', component: WhatsappComponent },
-  { path: 'calculadora', component: CalculadoraComponent },
-  { path: 'servicos', component: ServicosComponent }
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
+  { path: 'super-admin', component: SuperAdminComponent, canActivate: [superAdminGuard] },
+  { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'novo-orcamento', component: NovoOrcamentoComponent, canActivate: [authGuard] },
+  { path: 'clientes', component: ClientesComponent, canActivate: [authGuard] },
+  { path: 'recebimentos', component: RecebimentosComponent, canActivate: [authGuard] },
+  { path: 'whatsapp', component: WhatsappComponent, canActivate: [authGuard] },
+  { path: 'calculadora', component: CalculadoraComponent, canActivate: [authGuard] },
+  { path: 'servicos', component: ServicosComponent, canActivate: [authGuard] }
 ];

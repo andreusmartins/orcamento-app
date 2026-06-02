@@ -1,3 +1,3 @@
 export const environment = {
-  apiUrl: '/api'
+  apiUrl: 'https://SEU-APP.railway.app'  // <-- substitua pela URL do Railway após o deploy
 };

@@ -1,0 +1,141 @@
+<div class="min-h-screen bg-gray-100">
+
+  <!-- Header Admin -->
+  <div class="bg-blue-700 text-white px-4 py-4 flex items-center justify-between shadow">
+    <div>
+      <h1 class="text-xl font-bold">⚙️ Painel do Administrador</h1>
+      <p class="text-blue-200 text-sm">Gerencie quem acessa o sistema</p>
+    </div>
+    <div class="flex gap-2">
+      <button (click)="irParaSistema()"
+        class="bg-white text-blue-700 font-bold px-4 py-2 rounded-xl text-sm hover:bg-blue-50">
+        📋 Sistema
+      </button>
+      <button (click)="sair()"
+        class="bg-red-500 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-red-600">
+        Sair
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-2xl mx-auto p-4">
+
+    <!-- Alertas -->
+    @if (sucesso) {
+      <div class="bg-green-100 text-green-800 rounded-xl px-4 py-3 mb-4 font-semibold text-center">
+        ✅ {{ sucesso }}
+      </div>
+    }
+    @if (erro) {
+      <div class="bg-red-100 text-red-700 rounded-xl px-4 py-3 mb-4 font-semibold text-center">
+        ⚠️ {{ erro }}
+        <button (click)="erro=''" class="ml-2 underline text-sm">fechar</button>
+      </div>
+    }
+
+    <!-- Botão Novo Usuário -->
+    <div class="mb-4">
+      <button (click)="mostrarForm = !mostrarForm"
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl text-lg transition-colors">
+        @if (mostrarForm) { ❌ Cancelar } @else { ➕ Adicionar Novo Usuário }
+      </button>
+    </div>
+
+    <!-- Formulário Novo Usuário -->
+    @if (mostrarForm) {
+      <div class="bg-white rounded-2xl shadow p-6 mb-4">
+        <h2 class="text-lg font-bold text-gray-700 mb-4">Novo Usuário</h2>
+
+        <div class="mb-4">
+          <label class="block text-gray-600 font-semibold mb-1">Nome completo</label>
+          <input type="text" [(ngModel)]="novo.nome" placeholder="Ex: João Silva"
+            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:border-blue-500 focus:outline-none" />
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-gray-600 font-semibold mb-1">Email</label>
+          <input type="email" [(ngModel)]="novo.email" placeholder="email@exemplo.com"
+            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:border-blue-500 focus:outline-none" />
+        </div>
+
+        <div class="mb-5">
+          <label class="block text-gray-600 font-semibold mb-1">Senha inicial</label>
+          <input type="text" [(ngModel)]="novo.senha" placeholder="Mínimo 4 caracteres"
+            class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:border-blue-500 focus:outline-none" />
+          <p class="text-gray-400 text-xs mt-1">O usuário poderá usar esta senha para entrar</p>
+        </div>
+
+        <button (click)="criarUsuario()" [disabled]="criando"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-base transition-colors disabled:opacity-60">
+          @if (criando) { ⏳ Criando... } @else { ✅ Criar Usuário }
+        </button>
+      </div>
+    }
+
+    <!-- Lista de Usuários -->
+    <h2 class="text-gray-600 font-bold text-sm uppercase tracking-wide mb-3 px-1">
+      Usuários Cadastrados ({{ usuarios.length }})
+    </h2>
+
+    @if (carregando) {
+      <div class="text-center text-gray-400 py-8">Carregando...</div>
+    } @else if (usuarios.length === 0) {
+      <div class="text-center text-gray-400 py-8">Nenhum usuário cadastrado</div>
+    } @else {
+      @for (u of usuarios; track u.id) {
+        <div class="bg-white rounded-2xl shadow mb-3 p-4" [class.opacity-60]="!u.ativo">
+
+          <!-- Cabeçalho do card -->
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <p class="font-bold text-gray-800 text-lg">{{ u.nome }}</p>
+              <p class="text-gray-500 text-sm">{{ u.email }}</p>
+              <div class="flex gap-2 mt-1">
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  [class]="u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'">
+                  {{ u.role === 'ADMIN' ? '👑 Admin' : '👤 Cliente' }}
+                </span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  [class]="u.ativo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                  {{ u.ativo ? '✅ Ativo' : '🚫 Bloqueado' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="flex flex-col gap-2">
+              <button (click)="alternarAtivo(u)"
+                class="text-sm font-bold px-3 py-2 rounded-xl transition-colors"
+                [class]="u.ativo ? 'bg-orange-100 text-orange-700 hover:bg-orange-200' : 'bg-green-100 text-green-700 hover:bg-green-200'">
+                {{ u.ativo ? '🚫 Bloquear' : '✅ Liberar' }}
+              </button>
+              @if (u.role !== 'ADMIN') {
+                <button (click)="excluir(u)"
+                  class="text-sm font-bold px-3 py-2 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 transition-colors">
+                  🗑️ Excluir
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Trocar Senha -->
+          @if (u.role !== 'ADMIN') {
+            <div class="border-t border-gray-100 pt-3">
+              <p class="text-xs text-gray-400 font-semibold mb-2">ALTERAR SENHA</p>
+              <div class="flex gap-2">
+                <input type="text" [(ngModel)]="senhaMap[u.id]" placeholder="Nova senha"
+                  class="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                <button (click)="alterarSenha(u)"
+                  class="bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-gray-800">
+                  Salvar
+                </button>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+    }
+
+  </div>
+</div>
