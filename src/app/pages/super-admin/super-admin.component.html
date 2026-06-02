@@ -166,7 +166,7 @@
             📅 Vencimento: {{ dataLabel(e.dataVencimento) }}
           </p>
           <p *ngIf="e.valorMensalidade" class="text-sm text-gray-500">
-            💰 Mensalidade: R$ {{ e.valorMensalidade?.toFixed(2) }}
+            💰 Mensalidade: R$ {{ e.valorMensalidade!.toFixed(2) }}
           </p>
         </div>
       </div>
