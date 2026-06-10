@@ -13,25 +13,25 @@ export interface Usuario {
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  private api = `${environment.apiUrl}/usuarios`;
+  private readonly api = environment.apiUrl + '/usuarios';
 
   constructor(private http: HttpClient) {}
 
   listar() { return this.http.get<Usuario[]>(this.api); }
 
-  criar(dados: { nome: string; email: string; senha: string; empresaId?: string }) {
+  criar(dados: { nome: string; email: string; senha: string; empresaId?: string; role?: string }) {
     return this.http.post<Usuario>(this.api, dados);
   }
 
   alterarAtivo(id: number, ativo: boolean) {
-    return this.http.put<Usuario>(`${this.api}/${id}/ativo`, { ativo });
+    return this.http.put<Usuario>(this.api + '/' + id + '/ativo', { ativo });
   }
 
   alterarSenha(id: number, senha: string) {
-    return this.http.put(`${this.api}/${id}/senha`, { senha });
+    return this.http.put(this.api + '/' + id + '/senha', { senha });
   }
 
   excluir(id: number) {
-    return this.http.delete(`${this.api}/${id}`);
+    return this.http.delete(this.api + '/' + id);
   }
 }

@@ -23,12 +23,12 @@ export class SuperAdminComponent implements OnInit {
 
   form: Empresa = this.novoForm();
 
-  // Gerenciar usuários de uma empresa
+  // Gerenciar usuarios de uma empresa
   empresaSelecionadaId: number | null = null;
   usuarios: Usuario[] = [];
   mostrarUsuarios = false;
   mostrarFormUsuario = false;
-  novoUsuario = { nome: '', email: '', senha: '' };
+  novoUsuario = { nome: '', email: '', senha: '', role: 'ADMIN' };
   criandoUsuario = false;
   senhaMap: { [id: number]: string } = {};
 
@@ -83,7 +83,7 @@ export class SuperAdminComponent implements OnInit {
   }
 
   deletar(e: Empresa) {
-    if (!confirm(`Excluir a empresa "${e.nome}"? Isso não pode ser desfeito.`)) return;
+    if (!confirm('Excluir a empresa "' + e.nome + '"? Isso nao pode ser desfeito.')) return;
     this.empresaService.deletar(e.id!).subscribe(() => this.carregar());
   }
 
@@ -92,7 +92,7 @@ export class SuperAdminComponent implements OnInit {
     this.mostrarUsuarios = true;
     this.mostrarFormUsuario = false;
     this.usuarioService.listar().subscribe(lista => {
-      this.usuarios = lista.filter((u: Usuario) => (u as any).empresa?.id === e.id || (u as any).empresaId === e.id);
+      this.usuarios = lista.filter((u: Usuario) => u.empresa?.id === e.id);
     });
   }
 
@@ -108,28 +108,33 @@ export class SuperAdminComponent implements OnInit {
     }
     this.criandoUsuario = true;
     this.usuarioService.criar({
-      ...this.novoUsuario,
+      nome: this.novoUsuario.nome,
+      email: this.novoUsuario.email,
+      senha: this.novoUsuario.senha,
+      role: this.novoUsuario.role,
       empresaId: String(this.empresaSelecionadaId)
-    } as any).subscribe({
+    }).subscribe({
       next: () => {
-        this.sucesso = 'Usuário criado!';
-        this.novoUsuario = { nome: '', email: '', senha: '' };
+        this.sucesso = 'Usuario criado!';
+        this.novoUsuario = { nome: '', email: '', senha: '', role: 'ADMIN' };
         this.mostrarFormUsuario = false;
         this.criandoUsuario = false;
-        this.abrirUsuarios(this.empresas.find(e => e.id === this.empresaSelecionadaId)!);
+        const emp = this.empresas.find(e => e.id === this.empresaSelecionadaId);
+        if (emp) this.abrirUsuarios(emp);
         setTimeout(() => this.sucesso = '', 3000);
       },
-      error: (e) => {
-        this.erro = e.error?.erro || 'Erro ao criar usuário';
+      error: (e: any) => {
+        this.erro = e.error?.erro || 'Erro ao criar usuario';
         this.criandoUsuario = false;
       }
     });
   }
 
   alternarAtivoUsuario(u: Usuario) {
-    this.usuarioService.alterarAtivo(u.id, !u.ativo).subscribe(() =>
-      this.abrirUsuarios(this.empresas.find(e => e.id === this.empresaSelecionadaId)!)
-    );
+    this.usuarioService.alterarAtivo(u.id, !u.ativo).subscribe(() => {
+      const emp = this.empresas.find(e => e.id === this.empresaSelecionadaId);
+      if (emp) this.abrirUsuarios(emp);
+    });
   }
 
   alterarSenha(u: Usuario) {
@@ -137,7 +142,7 @@ export class SuperAdminComponent implements OnInit {
     if (!nova || nova.length < 4) { this.erro = 'Senha deve ter ao menos 4 caracteres'; return; }
     this.usuarioService.alterarSenha(u.id, nova).subscribe(() => {
       this.senhaMap[u.id] = '';
-      this.sucesso = `Senha de ${u.nome} alterada!`;
+      this.sucesso = 'Senha de ' + u.nome + ' alterada!';
       setTimeout(() => this.sucesso = '', 3000);
     });
   }

@@ -1,40 +1,40 @@
-<nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-  <div class="grid grid-cols-6 items-center h-16">
+<nav *ngIf="visivel" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-lg">
+  <div class="grid grid-cols-6 items-center h-16 max-w-lg mx-auto">
 
-    <a routerLink="/novo-orcamento" routerLinkActive="text-blue-600"
-       class="flex flex-col items-center gap-1 text-gray-400 text-[11px]">
-      <span class="text-base font-semibold">R$</span>
-      <span>Orcar</span>
+    <a routerLink="/novo-orcamento" routerLinkActive="!text-blue-600 !border-t-2 !border-blue-600"
+       class="flex flex-col items-center justify-center gap-0.5 text-gray-400 text-[10px] py-2 border-t-2 border-transparent transition-colors">
+      <span class="text-xl leading-none">📋</span>
+      <span>Orçamento</span>
     </a>
 
-    <a routerLink="/servicos" routerLinkActive="text-blue-600"
-       class="flex flex-col items-center gap-1 text-gray-400 text-[11px]">
-      <span class="text-base font-semibold">OS</span>
-      <span>Servicos</span>
+    <a routerLink="/servicos" routerLinkActive="!text-blue-600 !border-t-2 !border-blue-600"
+       class="flex flex-col items-center justify-center gap-0.5 text-gray-400 text-[10px] py-2 border-t-2 border-transparent transition-colors">
+      <span class="text-xl leading-none">🔧</span>
+      <span>Serviços</span>
     </a>
 
-    <a routerLink="/clientes" routerLinkActive="text-blue-600"
-       class="flex flex-col items-center gap-1 text-gray-400 text-[11px]">
-      <span class="text-base font-semibold">CL</span>
+    <a routerLink="/clientes" routerLinkActive="!text-blue-600 !border-t-2 !border-blue-600"
+       class="flex flex-col items-center justify-center gap-0.5 text-gray-400 text-[10px] py-2 border-t-2 border-transparent transition-colors">
+      <span class="text-xl leading-none">👥</span>
       <span>Clientes</span>
     </a>
 
-    <a routerLink="/recebimentos" routerLinkActive="text-blue-600"
-       class="flex flex-col items-center gap-1 text-gray-400 text-[11px]">
-      <span class="text-base font-semibold">$$</span>
-      <span>Receber</span>
+    <a routerLink="/recebimentos" routerLinkActive="!text-blue-600 !border-t-2 !border-blue-600"
+       class="flex flex-col items-center justify-center gap-0.5 text-gray-400 text-[10px] py-2 border-t-2 border-transparent transition-colors">
+      <span class="text-xl leading-none">💰</span>
+      <span>Pagamentos</span>
     </a>
 
-    <a routerLink="/whatsapp" routerLinkActive="text-blue-600"
-       class="flex flex-col items-center gap-1 text-gray-400 text-[11px]">
-      <span class="text-base font-semibold">WA</span>
-      <span>Zap</span>
+    <a routerLink="/whatsapp" routerLinkActive="!text-blue-600 !border-t-2 !border-blue-600"
+       class="flex flex-col items-center justify-center gap-0.5 text-gray-400 text-[10px] py-2 border-t-2 border-transparent transition-colors">
+      <span class="text-xl leading-none">💬</span>
+      <span>WhatsApp</span>
     </a>
 
-    <a routerLink="/calculadora" routerLinkActive="text-blue-600"
-       class="flex flex-col items-center gap-1 text-gray-400 text-[11px]">
-      <span class="text-base font-semibold">123</span>
-      <span>Calc</span>
+    <a routerLink="/calculadora" routerLinkActive="!text-blue-600 !border-t-2 !border-blue-600"
+       class="flex flex-col items-center justify-center gap-0.5 text-gray-400 text-[10px] py-2 border-t-2 border-transparent transition-colors">
+      <span class="text-xl leading-none">🔢</span>
+      <span>Calculadora</span>
     </a>
 
   </div>

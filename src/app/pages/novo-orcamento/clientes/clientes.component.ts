@@ -17,6 +17,7 @@ export class ClientesComponent implements OnInit {
   editando: Cliente | null = null;
 
   form: Cliente = { nome: '', telefone: '', endereco: '' };
+  busca = '';
 
   constructor(private clienteService: ClienteService) {}
 
@@ -26,6 +27,14 @@ export class ClientesComponent implements OnInit {
 
   carregar() {
     this.clienteService.listar().subscribe(c => this.clientes = c);
+  }
+
+  get clientesFiltrados(): Cliente[] {
+    if (!this.busca.trim()) return this.clientes;
+    const b = this.busca.toLowerCase();
+    return this.clientes.filter(c =>
+      c.nome.toLowerCase().includes(b) || (c.telefone || '').includes(b)
+    );
   }
 
   abrirFormulario() {

@@ -9,13 +9,14 @@ import { LoginComponent } from './pages/login/login.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { SuperAdminComponent } from './pages/super-admin/super-admin.component';
 import { authGuard, adminGuard, superAdminGuard } from './core/guards/auth.guard';
+import { unsavedChangesGuard } from './core/guards/unsaved-changes.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'super-admin', component: SuperAdminComponent, canActivate: [superAdminGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [authGuard, adminGuard] },
-  { path: 'novo-orcamento', component: NovoOrcamentoComponent, canActivate: [authGuard] },
+  { path: 'novo-orcamento', component: NovoOrcamentoComponent, canActivate: [authGuard], canDeactivate: [unsavedChangesGuard] },
   { path: 'clientes', component: ClientesComponent, canActivate: [authGuard] },
   { path: 'recebimentos', component: RecebimentosComponent, canActivate: [authGuard] },
   { path: 'whatsapp', component: WhatsappComponent, canActivate: [authGuard] },

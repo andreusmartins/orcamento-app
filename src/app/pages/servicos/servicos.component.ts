@@ -14,7 +14,9 @@ export class ServicosComponent implements OnInit {
   orcamentos: Orcamento[] = [];
   filtro: 'todos' | StatusOrcamento | 'servicos' = 'todos';
   editandoAgendaId: number | null = null;
+  busca = '';
   carregando = false;
+  erroRede = false;
 
   agendaForm: AgendaPayload = this.novaAgenda();
 
@@ -29,19 +31,30 @@ export class ServicosComponent implements OnInit {
 
   carregar() {
     this.carregando = true;
+    this.erroRede = false;
     this.orcamentoService.listar().subscribe({
       next: orcamentos => {
         this.orcamentos = orcamentos;
         this.carregando = false;
       },
-      error: () => this.carregando = false
+      error: () => { this.carregando = false; this.erroRede = true; }
     });
   }
 
   get filtrados(): Orcamento[] {
-    if (this.filtro === 'todos') return this.ordenados(this.orcamentos);
-    if (this.filtro === 'servicos') return this.ordenados(this.orcamentos.filter(o => o.ordemServico));
-    return this.ordenados(this.orcamentos.filter(o => o.status === this.filtro));
+    let lista: Orcamento[];
+    if (this.filtro === 'todos') lista = this.orcamentos;
+    else if (this.filtro === 'servicos') lista = this.orcamentos.filter(o => o.ordemServico);
+    else lista = this.orcamentos.filter(o => o.status === this.filtro);
+
+    if (this.busca.trim()) {
+      const b = this.busca.toLowerCase();
+      lista = lista.filter(o =>
+        (o.cliente?.nome || '').toLowerCase().includes(b) ||
+        (o.tipoServico || '').toLowerCase().includes(b)
+      );
+    }
+    return this.ordenados(lista);
   }
 
   total(o: Orcamento): number {

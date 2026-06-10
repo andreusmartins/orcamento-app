@@ -15,6 +15,7 @@ export class LoginComponent {
   senha = '';
   erro = '';
   carregando = false;
+  mostrarDicaSenha = false;
 
   constructor(private auth: AuthService, private router: Router) {
     if (auth.isLogado()) {

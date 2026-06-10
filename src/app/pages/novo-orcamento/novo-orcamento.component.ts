@@ -28,12 +28,21 @@ interface EmpresaConfig {
   templateUrl: './novo-orcamento.component.html'
 })
 export class NovoOrcamentoComponent implements OnInit {
+
+  temAlteracoesNaoSalvas(): boolean {
+    const temCliente = !!this.clienteSelecionado;
+    const temItens = this.itens.some(i => i.descricao.trim() || (i.valor && i.valor > 0));
+    return (temCliente || temItens) && !this.orcamentoSalvoId;
+  }
+
   clientes: Cliente[] = [];
   clienteSelecionado: number | null = null;
   itens: Item[] = [{ descricao: '', valor: null, observacao: '' }];
   sucesso = false;
   carregando = false;
   mostrarEmpresa = false;
+  erroValidacao = '';
+  orcamentoSalvoId: number | null = null;
 
   agenda = {
     tipoServico: '',
@@ -97,9 +106,17 @@ export class NovoOrcamentoComponent implements OnInit {
   }
 
   salvar() {
+    this.erroValidacao = '';
     if (!this.clienteSelecionado) return;
-    this.carregando = true;
 
+    // U-03: Validar itens
+    const itemInvalido = this.itens.find(i => !i.descricao.trim() || !i.valor || i.valor <= 0);
+    if (itemInvalido) {
+      this.erroValidacao = 'Preencha a descrição e o valor de todos os itens do orçamento.';
+      return;
+    }
+
+    this.carregando = true;
     const payload = {
       clienteId: this.clienteSelecionado,
       status: 'pendente' as const,
@@ -116,10 +133,11 @@ export class NovoOrcamentoComponent implements OnInit {
     };
 
     this.orcamentoService.criar(payload).subscribe({
-      next: () => {
+      next: (orcamento) => {
         this.sucesso = true;
+        this.orcamentoSalvoId = orcamento.id || null; // U-07: rastrear se foi salvo
         this.carregando = false;
-        setTimeout(() => this.sucesso = false, 3000);
+        setTimeout(() => this.sucesso = false, 4000);
       },
       error: () => this.carregando = false
     });
@@ -223,7 +241,7 @@ export class NovoOrcamentoComponent implements OnInit {
   enviarWhatsApp() {
     const cliente = this.clientes.find(c => c.id === Number(this.clienteSelecionado));
     if (!cliente?.telefone) return;
-    const texto = `Ola ${cliente.nome}, segue seu orcamento no valor de R$ ${this.total.toFixed(2)}. ${this.empresa.pix ? 'Chave Pix: ' + this.empresa.pix + '.' : ''}`;
+    const texto = `Olá ${cliente.nome}! Segue seu orçamento no valor de R$ ${this.total.toFixed(2)}. ${this.empresa.pix ? 'Chave Pix: ' + this.empresa.pix + '.' : ''} Qualquer dúvida estou à disposição.`;
     const numero = cliente.telefone.replace(/\D/g, '');
     window.open(`https://wa.me/55${numero}?text=${encodeURIComponent(texto)}`, '_blank');
   }

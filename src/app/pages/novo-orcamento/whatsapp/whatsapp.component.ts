@@ -23,22 +23,22 @@ export class WhatsappComponent implements OnInit {
     {
       label: 'Segue orcamento',
       icone: 'R$',
-      texto: (nome: string) => `Ola ${nome}! Segue o orcamento conforme combinado. Qualquer duvida fico a disposicao.`
+      texto: (nome: string) => `Olá ${nome}! Segue o orçamento conforme combinado. Qualquer dúvida fico à disposição.`
     },
     {
       label: 'Agendar amanha',
       icone: 'AG',
-      texto: (nome: string) => `Ola ${nome}! Posso agendar para amanha? Se preferir, me diga o melhor horario.`
+      texto: (nome: string) => `Olá ${nome}! Posso agendar para amanhã? Se preferir, me diga o melhor horário.`
     },
     {
       label: 'Servico concluido',
       icone: 'OK',
-      texto: (nome: string) => `Ola ${nome}! Seu servico foi concluido. Obrigado pela confianca.`
+      texto: (nome: string) => `Olá ${nome}! Seu serviço foi concluído. Obrigado pela confiança!`
     },
     {
       label: 'Pagamento pendente',
       icone: '$$',
-      texto: (nome: string) => `Ola ${nome}! Passando para lembrar que o pagamento do servico esta pendente. Posso te enviar a chave Pix?`
+      texto: (nome: string) => `Olá ${nome}! Passando para lembrar que o pagamento do serviço está pendente. Posso te enviar a chave Pix?`
     }
   ];
 
@@ -112,7 +112,7 @@ export class WhatsappComponent implements OnInit {
     const total = this.totalOrcamento(o).toFixed(2);
     const servico = o.tipoServico ? ` de ${o.tipoServico}` : '';
     const agenda = o.dataServico ? ` Servico agendado para ${new Date(o.dataServico).toLocaleString('pt-BR')}.` : '';
-    const texto = `Ola ${this.clienteSelecionado?.nome}! Segue o orcamento #${o.id}${servico} no valor de R$ ${total}.${agenda}`;
+    const texto = `Olá ${this.clienteSelecionado?.nome}! Segue o orçamento #${o.id}${servico} no valor de R$ ${total}.${agenda} Qualquer dúvida estou à disposição.`;
     this.enviarMensagem(texto);
   }
 }

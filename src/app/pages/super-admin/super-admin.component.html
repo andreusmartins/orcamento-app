@@ -44,6 +44,11 @@
               class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-3 focus:border-blue-500 focus:outline-none"/>
             <input type="text" [(ngModel)]="novoUsuario.senha" placeholder="Senha inicial"
               class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-3 focus:border-blue-500 focus:outline-none"/>
+            <select [(ngModel)]="novoUsuario.role"
+              class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-base mb-3 focus:border-blue-500 focus:outline-none bg-white">
+              <option value="ADMIN">🔑 Admin (gerencia a empresa)</option>
+              <option value="CLIENTE">👤 Cliente (faz orçamentos)</option>
+            </select>
             <button (click)="criarUsuario()" [disabled]="criandoUsuario"
               class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 disabled:opacity-60">
               {{ criandoUsuario ? 'Criando...' : '✅ Criar Usuário' }}

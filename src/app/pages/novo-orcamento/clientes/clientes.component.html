@@ -8,6 +8,11 @@
     </button>
   </div>
 
+  <!-- Busca -->
+  <input *ngIf="clientes.length > 4" [(ngModel)]="busca"
+         placeholder="🔍 Buscar cliente por nome ou telefone..."
+         class="w-full border border-gray-200 rounded-xl p-3 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-200"/>
+
   <!-- Formulário -->
   <div *ngIf="mostrarFormulario"
        class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
@@ -42,7 +47,7 @@
   </div>
 
   <!-- Lista vazia -->
-  <div *ngIf="clientes.length === 0 && !mostrarFormulario"
+  <div *ngIf="clientesFiltrados.length === 0 && !mostrarFormulario"
        class="text-center py-16 text-gray-400">
     <div class="text-5xl mb-3">👥</div>
     <p class="text-sm">Nenhum cliente cadastrado ainda</p>
@@ -50,7 +55,7 @@
   </div>
 
   <!-- Lista de clientes -->
-  <div *ngFor="let c of clientes"
+  <div *ngFor="let c of clientesFiltrados"
        class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-3">
 
     <div class="flex justify-between items-start">

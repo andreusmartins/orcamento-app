@@ -134,6 +134,7 @@ export class CalculadoraComponent {
       this.operacao = null;
       this.expressaoAtual = '';
       this.aguardandoNovoValor = true;
+      setTimeout(() => { if (this.visor === 'Erro') this.limpar(); }, 1500);
       return;
     }
 
@@ -184,6 +185,7 @@ export class CalculadoraComponent {
   }
 
   private get valorNumerico(): number {
+    if (this.visor === 'Erro') return 0;
     const valor = Number(this.visor.replace(',', '.'));
     return Number.isFinite(valor) ? valor : 0;
   }

@@ -62,5 +62,14 @@
     <p class="text-center text-gray-400 text-sm mt-6">
       Problemas para entrar? Fale com o administrador.
     </p>
+
+    <div *ngIf="mostrarDicaSenha" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mt-4 text-sm text-blue-700 text-center">
+      💡 Entre em contato com o administrador do sistema para redefinir sua senha. Ele pode alterar pelo painel de administração.
+    </div>
+
+    <button (click)="mostrarDicaSenha = !mostrarDicaSenha"
+            class="w-full text-blue-500 text-sm mt-3 hover:text-blue-700 underline">
+      Esqueci minha senha
+    </button>
   </div>
 </div>
