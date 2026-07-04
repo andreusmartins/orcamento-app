@@ -23,7 +23,7 @@ export class AdminComponent implements OnInit {
   mostrarForm = false;
 
   // Alterar senha
-  senhaMap: { [id: number]: string } = {};
+  senhaMap: { [id: string]: string } = {};
 
   constructor(
     private usuarioService: UsuarioService,

@@ -1,35 +1,64 @@
-﻿import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { Injectable } from '@angular/core';
+import { from } from 'rxjs';
+import { supabase } from '../supabase/supabase.client';
 import { Cliente } from '../models/cliente.model';
 
 @Injectable({ providedIn: 'root' })
 export class ClienteService {
-  private api = `${environment.apiUrl}/clientes`;
-
-  constructor(private http: HttpClient) {}
 
   listar() {
-    return this.http.get<Cliente[]>(this.api);
+    return from(
+      supabase.from('clientes').select('*').order('nome').then(({ data, error }) => {
+        if (error) throw error;
+        return (data || []) as Cliente[];
+      })
+    );
   }
 
-  list() {
-    return this.listar();
-  }
+  list() { return this.listar(); }
 
   buscarPorId(id: number) {
-    return this.http.get<Cliente>(`${this.api}/${id}`);
+    return from(
+      supabase.from('clientes').select('*').eq('id', id).single().then(({ data, error }) => {
+        if (error) throw error;
+        return data as Cliente;
+      })
+    );
   }
 
   criar(cliente: Cliente) {
-    return this.http.post<Cliente>(this.api, cliente);
+    return from(
+      supabase.from('clientes').insert({
+        nome: cliente.nome,
+        telefone: cliente.telefone,
+        endereco: cliente.endereco,
+        email: cliente.email || null
+      }).select().single().then(({ data, error }) => {
+        if (error) throw error;
+        return data as Cliente;
+      })
+    );
   }
 
   atualizar(id: number, cliente: Cliente) {
-    return this.http.put<Cliente>(`${this.api}/${id}`, cliente);
+    return from(
+      supabase.from('clientes').update({
+        nome: cliente.nome,
+        telefone: cliente.telefone,
+        endereco: cliente.endereco,
+        email: cliente.email || null
+      }).eq('id', id).select().single().then(({ data, error }) => {
+        if (error) throw error;
+        return data as Cliente;
+      })
+    );
   }
 
   deletar(id: number) {
-    return this.http.delete(`${this.api}/${id}`);
+    return from(
+      supabase.from('clientes').delete().eq('id', id).then(({ error }) => {
+        if (error) throw error;
+      })
+    );
   }
 }

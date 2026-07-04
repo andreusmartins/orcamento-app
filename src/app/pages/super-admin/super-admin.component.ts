@@ -30,7 +30,7 @@ export class SuperAdminComponent implements OnInit {
   mostrarFormUsuario = false;
   novoUsuario = { nome: '', email: '', senha: '', role: 'ADMIN' };
   criandoUsuario = false;
-  senhaMap: { [id: number]: string } = {};
+  senhaMap: { [id: string]: string } = {};
 
   constructor(
     private empresaService: EmpresaService,

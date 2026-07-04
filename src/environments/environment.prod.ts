@@ -1,3 +1,5 @@
 export const environment = {
-  apiUrl: 'https://atendimento-production-bb60.up.railway.app'  // <-- substitua pela URL do Railway após o deploy
+  production: true,
+  supabaseUrl: 'https://mrnhhcpzuslajwdvoyem.supabase.co',
+  supabaseKey: 'sb_publishable_AArR1COrwAC_mc80gPVMWA_w2Pr47wK'
 };
