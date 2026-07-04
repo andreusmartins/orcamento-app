@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://sua-url.up.railway.app'
+  apiUrl: 'https://atendimento-production-bb60.up.railway.app'
 };
