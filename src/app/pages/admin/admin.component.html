@@ -118,20 +118,7 @@
             </div>
           </div>
 
-          <!-- Trocar Senha -->
-          @if (u.role !== 'ADMIN') {
-            <div class="border-t border-gray-100 pt-3">
-              <p class="text-xs text-gray-400 font-semibold mb-2">ALTERAR SENHA</p>
-              <div class="flex gap-2">
-                <input type="text" [(ngModel)]="senhaMap[u.id]" placeholder="Nova senha"
-                  class="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
-                <button (click)="alterarSenha(u)"
-                  class="bg-gray-700 text-white font-bold px-4 py-2 rounded-xl text-sm hover:bg-gray-800">
-                  Salvar
-                </button>
-              </div>
-            </div>
-          }
+
 
         </div>
       }

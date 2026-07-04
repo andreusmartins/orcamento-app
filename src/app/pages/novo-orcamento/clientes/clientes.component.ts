@@ -18,6 +18,7 @@ export class ClientesComponent implements OnInit {
 
   form: Cliente = { nome: '', telefone: '', endereco: '' };
   busca = '';
+  erro = '';
 
   constructor(private clienteService: ClienteService) {}
 
@@ -41,22 +42,26 @@ export class ClientesComponent implements OnInit {
     this.form = { nome: '', telefone: '', endereco: '' };
     this.editando = null;
     this.mostrarFormulario = true;
+    this.erro = '';
   }
 
   editar(cliente: Cliente) {
     this.form = { ...cliente };
     this.editando = cliente;
     this.mostrarFormulario = true;
+    this.erro = '';
   }
 
   cancelar() {
     this.mostrarFormulario = false;
     this.editando = null;
+    this.erro = '';
   }
 
   salvar() {
     if (!this.form.nome || !this.form.telefone) return;
     this.carregando = true;
+    this.erro = '';
 
     const acao = this.editando?.id
       ? this.clienteService.atualizar(this.editando.id!, this.form)
@@ -68,7 +73,10 @@ export class ClientesComponent implements OnInit {
         this.cancelar();
         this.carregando = false;
       },
-      error: () => this.carregando = false
+      error: (e: any) => {
+        this.erro = e?.message || 'Erro ao salvar. Tente novamente.';
+        this.carregando = false;
+      }
     });
   }
 

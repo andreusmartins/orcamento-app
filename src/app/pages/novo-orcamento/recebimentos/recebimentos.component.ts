@@ -18,6 +18,7 @@ export class RecebimentosComponent implements OnInit {
   filtro: 'todos' | StatusRecebimento = 'todos';
   mostrarFormulario = false;
   carregando = false;
+  erro = '';
 
   readonly statusOptions: StatusRecebimento[] = ['pago', 'parcial', 'pendente', 'vencido'];
   readonly filtros: Array<'todos' | StatusRecebimento> = ['todos', 'pago', 'parcial', 'pendente', 'vencido'];
@@ -58,6 +59,7 @@ export class RecebimentosComponent implements OnInit {
   }
 
   abrirFormulario() {
+    this.erro = '';
     this.form = this.novoForm();
     this.mostrarFormulario = true;
   }
@@ -84,7 +86,7 @@ export class RecebimentosComponent implements OnInit {
         this.cancelar();
         this.carregando = false;
       },
-      error: () => this.carregando = false
+      error: (e: any) => { this.erro = e?.message || 'Erro ao salvar. Tente novamente.'; this.carregando = false; }
     });
   }
 

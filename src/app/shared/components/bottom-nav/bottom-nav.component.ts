@@ -15,6 +15,6 @@ export class BottomNavComponent {
 
   get visivel(): boolean {
     const role = this.auth.getUsuario()?.role;
-    return role === 'CLIENTE' || !role;
+    return role === 'CLIENTE' || role === 'ADMIN' || !role;
   }
 }
