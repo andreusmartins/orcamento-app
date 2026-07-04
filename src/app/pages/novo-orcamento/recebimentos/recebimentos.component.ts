@@ -22,7 +22,7 @@ export class RecebimentosComponent implements OnInit {
 
   readonly statusOptions: StatusRecebimento[] = ['pago', 'parcial', 'pendente', 'vencido'];
   readonly filtros: Array<'todos' | StatusRecebimento> = ['todos', 'pago', 'parcial', 'pendente', 'vencido'];
-  readonly formasPagamento = ['Pix', 'Dinheiro', 'Cartao', 'Boleto', 'Transferencia'];
+  readonly formasPagamento = ['Pix', 'Dinheiro', 'Cartão', 'Boleto', 'Transferência'];
 
   form = this.novoForm();
 

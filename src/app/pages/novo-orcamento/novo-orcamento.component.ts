@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ClienteService } from '../../core/services/cliente.service';
 import { OrcamentoService } from '../../core/services/orcamento.service';
 import { Cliente } from '../../core/models/cliente.model';
@@ -24,7 +25,7 @@ interface EmpresaConfig {
 @Component({
   selector: 'app-novo-orcamento',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './novo-orcamento.component.html'
 })
 export class NovoOrcamentoComponent implements OnInit {
